@@ -7,18 +7,18 @@ body {
     flex-direction: column; 
     align-items: center; 
     justify-content: flex-start;
-    min-height: 100vh;
+    height: 100vh;
     margin: 0; 
     padding: 0;
     padding-top: 10vh;
-    overflow-x: hidden; 
+    overflow: hidden; 
 }
 
 body.logged-in {
+    height: auto; 
     overflow-y: auto;
     padding-top: 40px;
 }
-
 h1 { 
     color: #c4b07b; 
     text-transform: uppercase;
@@ -278,10 +278,18 @@ input[type="text"]:focus {
 
 .lol-back-btn img {
     width: 35px;
-    filter: drop-shadow(0 0 5px rgba(196, 176, 123, 0.5));
+    filter: drop-shadow(0 0 5px #c4b07b80);
     transition: transform 0.3s;
 }
 
 .lol-back-btn:hover img {
     transform: scale(1.1);
+}
+
+#quote-container {
+    color: #c4b07b;
+    font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-weight: 100;
+    font-size: 20px;
+    text-align: center;
 }

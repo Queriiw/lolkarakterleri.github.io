@@ -13,7 +13,24 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-const izinliKullanicilar = ["queri", "zecron"]; 
+const izinliKullanicilar = ["queri", "zecron", "amkench"]; 
+
+const replikler = [
+    { metin: "Anakin tv kalp krizi AHHH AHHHH!", sampiyon: "Queri" },
+    { metin: "Ya ölümcül tempo ne kanka ya.", sampiyon: "AmKench" },
+    { metin: "Tabi sitelerle oynamayı biliyor.", sampiyon: "Zecron" },
+    { metin: "Ne mutlu Türküm diyene!", sampiyon: "Atatürk" },
+    { metin: "Zırla lan zırla.", sampiyon: "O Adam İşte" },
+    { metin: "Kesinkin sagaKAN is good to tnask.", sampiyon: "Queri" },
+    { metin: "Şerefsiz ya.", sampiyon: "Elraenn" },
+    { metin: "Bip Bip.", sampiyon: "Delusion" },
+    { metin: "The winner takes it all, the loser has to fall.", sampiyon: "ABBA" },
+    { metin: "Tuvalet tıkandı.", sampiyon: "Mete" },
+    { metin: "ShotMini.", sampiyon: "AmKench" },
+    { metin: "Sessizlik...", sampiyon: "Klavyem" },
+    { metin: "Aishite aishite.", sampiyon: "Ado" },
+    { metin: "Ses yakınları.", sampiyon: "Zecron ve AmKench" },
+];
 
 const loginArea = document.getElementById('login-area');
 const backBtn = document.getElementById('back-btn');
@@ -24,25 +41,47 @@ const progressText = document.getElementById('progress-text');
 const mainTitle = document.getElementById('main-title');
 const welcomeMsg = document.getElementById('welcome-msg');
 const listeDiv = document.getElementById('liste');
+const quoteDiv = document.getElementById('quote-container');
+const refreshBtn = document.getElementById('refresh-quote');
 
 let aktifKullanici = "";
 let toplamKarakter = 0;
+let aktifSes = null;
+
+function sesCal(dosyaYolu) {
+    if (aktifSes) {
+        aktifSes.pause();
+        aktifSes.currentTime = 0;
+    }
+    aktifSes = new Audio(dosyaYolu);
+    aktifSes.play().catch(e => {});
+}
 
 document.getElementById('start-btn').addEventListener('click', () => {
     const inputIsim = document.getElementById('username').value.trim().toLowerCase();
     
     if (!izinliKullanicilar.includes(inputIsim)) {
+        sesCal('sf/dscnt.mp3');
         alert("Listeye girmek için yaz bana dc:queriiw");
         return;
     }
 
-    aktifKullanici = inputIsim;
+    sesCal('sf/click.mp3');
     
+    aktifKullanici = inputIsim;
     document.body.classList.add('logged-in');
+    
     loginArea.style.display = "none";
     mainTitle.style.display = "none";
+    if (quoteDiv) quoteDiv.style.display = "none";
+    if (refreshBtn) refreshBtn.style.display = "none";
     
-    welcomeMsg.innerText = (aktifKullanici === "queri") ? "QUERI BEY HOŞGELDINIZ." : "Z-ZECRON-CHAN!! BAKA!";
+    const mesajlar = {
+        "queri": "QUERI BEY HOŞGELDINIZ, KRALIN YERİ HAZIR.",
+        "zecron": "Z-ZECRON-CHAN!! BAKA! YİNE Mİ SEN?",
+        "amkench": "YİNE FEEDLİCEK...  "
+    };
+    welcomeMsg.innerText = mesajlar[aktifKullanici] || `HOŞGELDİN ${aktifKullanici.toUpperCase()}!`;
     
     welcomeMsg.style.display = "block";
     statsPanel.style.display = "flex";
@@ -50,6 +89,13 @@ document.getElementById('start-btn').addEventListener('click', () => {
     backBtn.style.display = "block";
 
     tumKarakterleriGetir();
+});
+
+document.getElementById('username').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+        e.preventDefault();
+        document.getElementById('start-btn').click();
+    }
 });
 
 searchInput.addEventListener('input', (e) => {
@@ -61,13 +107,19 @@ searchInput.addEventListener('input', (e) => {
 });
 
 backBtn.addEventListener('click', () => {
+    window.scrollTo(0, 0);
     document.body.classList.remove('logged-in');
+    
     listeDiv.style.display = "none";
     welcomeMsg.style.display = "none";
     statsPanel.style.display = "none";
     backBtn.style.display = "none"; 
-    mainTitle.style.display = "block";
-    loginArea.style.display = "flex";
+
+    mainTitle.style.display = "";
+    loginArea.style.display = "";
+    if (quoteDiv) quoteDiv.style.display = "";
+    if (refreshBtn) refreshBtn.style.display = "";
+
     aktifKullanici = ""; 
     document.getElementById('username').value = "";
     searchInput.value = ""; 
@@ -82,7 +134,7 @@ async function tumKarakterleriGetir() {
         listeyiYukle(karakterler);
         takipBaslat();
     } catch (error) {
-        console.error("Veri çekme hatası oldu yaz bana:", error);
+        console.error(error);
     }
 }
 
@@ -106,6 +158,11 @@ function listeyiYukle(karakterler) {
 
         label.querySelector('input').addEventListener('change', async (e) => {
             if (!aktifKullanici) return;
+
+            if (e.target.checked) {
+                sesCal('sf/done.mp3');
+            }
+
             await setDoc(doc(db, "kullanici_listeleri", aktifKullanici), {
                 [isim]: e.target.checked
             }, { merge: true });
@@ -139,3 +196,37 @@ function takipBaslat() {
         }
     });
 }
+
+const videoElement = document.getElementById('bg-video');
+const videoListesi = ["img/tahm-kench.mp4", "img/xerath.mp4", "img/twitch.mp4", "img/lucian.mp4", "img/zoe.mp4", "img/masteryi.mp4", "img/ryze.mp4"];
+
+function rastgeleVideoOynat() {
+    const rastgeleIndex = Math.floor(Math.random() * videoListesi.length);
+    videoElement.src = videoListesi[rastgeleIndex];
+    videoElement.play().catch(e => {});
+}
+
+videoElement.onended = rastgeleVideoOynat;
+
+document.querySelector('.user-box').addEventListener('mouseenter', () => {
+    if (videoElement.paused) {
+        videoElement.play();
+    }
+});
+
+rastgeleVideoOynat();
+
+function rastgeleReplikYaz() {
+    if (quoteDiv) {
+        const secilen = replikler[Math.floor(Math.random() * replikler.length)];
+        quoteDiv.innerHTML = `"${secilen.metin}" — <strong>${secilen.sampiyon}</strong>`;
+    }
+}
+
+if (refreshBtn) {
+    refreshBtn.addEventListener('click', () => {
+        rastgeleReplikYaz();
+    });
+}
+
+rastgeleReplikYaz();

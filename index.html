@@ -14,14 +14,22 @@
     <h1 id="main-title">LOL KARAKTER LISTESI</h1>
     <div id="welcome-msg"></div>
     <div class="user-box" id="login-area">
-        <video id="bg-video" autoplay loop muted playsinline>
-            <source src="img/tahm-kench.mp4" type="video/mp4">
-        </video>
+    <video id="bg-video" autoplay muted playsinline>
+        <source src="img/tahm-kench.mp4" type="video/mp4">
+    </video>
         <div class="login-content">
-            <input type="text" id="username" placeholder="Liste adını gir">
+            <input type="text" id="username" autocomplete="off" placeholder="Liste adını gir">
             <button id="start-btn" class="lol-style-btn">LISTEYI GOR</button>
         </div>
     </div>
+
+<div style="display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 15px;">
+    <div id="quote-container" style="font-style: italic; color: #c4b07b;"></div>
+    <button id="refresh-quote" style="background: none; border: 1px solid #785a28; color: #c4b07b; cursor: pointer; padding: 10px 28px; font-size: 12px; border-radius: 3px; transition: 0.3s;">
+        ↻
+    </button>
+</div>
+
     <div id="stats-panel">
         <div id="progress-container">
             <div id="progress-bar-wrapper">
