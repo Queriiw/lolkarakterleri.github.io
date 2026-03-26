@@ -13,22 +13,24 @@
     </button>
     <h1 id="main-title">LOL KARAKTER LISTESI</h1>
     <div id="welcome-msg"></div>
+    <div id="welcome-subtitle"></div>
+    
     <div class="user-box" id="login-area">
-    <video id="bg-video" autoplay muted playsinline>
-        <source src="img/tahm-kench.mp4" type="video/mp4">
-    </video>
+        <video id="bg-video" autoplay muted playsinline>
+            <source src="img/tahm-kench.mp4" type="video/mp4">
+        </video>
         <div class="login-content">
             <input type="text" id="username" autocomplete="off" placeholder="Liste adını gir">
             <button id="start-btn" class="lol-style-btn">LISTEYI GOR</button>
         </div>
     </div>
 
-<div style="display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 15px;">
-    <div id="quote-container" style="font-style: italic; color: #c4b07b;"></div>
-    <button id="refresh-quote" style="background: none; border: 1px solid #785a28; color: #c4b07b; cursor: pointer; padding: 10px 28px; font-size: 12px; border-radius: 3px; transition: 0.3s;">
-        ↻
-    </button>
-</div>
+    <div style="display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 15px;">
+        <div id="quote-container" style="font-style: italic; color: #c4b07b;"></div>
+        <button id="refresh-quote" style="background: none; border: 1px solid #785a28; color: #c4b07b; cursor: pointer; padding: 10px 28px; font-size: 12px; border-radius: 3px; transition: 0.3s;">
+            ↻
+        </button>
+    </div>
 
     <div id="stats-panel">
         <div id="progress-container">
@@ -40,8 +42,52 @@
         <div id="search-container">
             <input type="text" id="search-input" placeholder="Şampiyon Ara...">
         </div>
+
     </div>
-    <div id="liste"></div>
+
+    <section id="champion-spotlight" style="display: none;">
+        <div class="spotlight-header">
+            <span class="spotlight-title">GÜNÜN ŞAMPİYONU</span>
+            <button id="refresh-spotlight" class="spotlight-refresh-btn">YENİ ŞAMPİYON</button>
+        </div>
+        <div class="spotlight-body">
+            <img id="spotlight-img" src="" alt="Şampiyon görseli">
+            <div class="spotlight-info">
+                <h2 id="spotlight-name">-</h2>
+                <p id="spotlight-subtitle">-</p>
+                <p id="spotlight-blurb">-</p>
+                <div id="spotlight-tags"></div>
+            </div>
+        </div>
+    </section>
+
+    <div id="main-layout" style="display: none;">
+        <div id="liste"></div>
+    </div>
+
+    <div id="notes-panel">
+        <div id="notes-blur-overlay">
+            <div class="notes-lock-content">
+                <div class="notes-lock-icon">📋</div>
+                <p class="notes-lock-text">Notları görmek ve yazmak için</p>
+                <input type="text" id="notes-username" autocomplete="off" placeholder="İsminizi girin...">
+                <button id="notes-enter-btn" class="lol-style-btn">GİR</button>
+            </div>
+        </div>
+
+        <div id="notes-content">
+            <div class="notes-header">
+                <span class="notes-title">📋 NOTLAR</span>
+                <span id="notes-current-user" class="notes-user-badge"></span>
+            </div>
+            <div id="notes-list"></div>
+            <div class="notes-input-area">
+                <textarea id="note-input" placeholder="Bir not yaz..." maxlength="200"></textarea>
+                <button id="send-note-btn" class="lol-style-btn">GÖNDER</button>
+            </div>
+        </div>
+    </div>
+
     <script type="module" src="app.js"></script>
 </body>
 </html>
