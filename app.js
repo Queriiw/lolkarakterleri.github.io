@@ -44,9 +44,7 @@ const replikler = [
     { metin: "/kiss queri.", sampiyon: "Discord" },
     { metin: "Queri maçında iyi gidiyormuş?.", sampiyon: "Zecron" },
     { metin: "Conquest ile savaştım.", sampiyon: "Oliver" },
-    { metin: "I woke up in the middle of the night.", sampiyon: "Akon" },
-
-
+    { metin: "I woke up in the middle of the night.", sampiyon: "Akon" }
 ];
 
 const kullaniciHikayeleri = {
@@ -160,13 +158,13 @@ function sesCal(dosyaYolu) {
     aktifSes.play().catch(e => {});
 }
 
+
 function rastgeleSec(liste) {
     if (!Array.isArray(liste) || !liste.length) return "";
     return liste[Math.floor(Math.random() * liste.length)];
 }
 
 function rastgeleSampiyonSesiCalTR(championId) {
-    // Sadece TR sesleri.
     const sesHavuzu = [
         `https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/tr_tr/v1/champion-choose-vo/${championId}.ogg`,
         `https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/tr_tr/v1/champion-ban-vo/${championId}.ogg`,
@@ -194,46 +192,44 @@ function rastgeleSampiyonSesiCalTR(championId) {
 }
 
 document.getElementById('start-btn').addEventListener('click', () => {
+    const sans = Math.floor(Math.random() * 30) + 1;
+    if (sans === 3) {
+        jumpscareUygula();
+        return; 
+    }
+
     const inputIsim = document.getElementById('username').value.trim().toLowerCase();
-    
     if (!izinliKullanicilar.includes(inputIsim)) {
         sesCal('sf/dscnt.mp3');
-        alert("Listeye girmek için yaz bana dc:queriiw");
+        alert("Listeye girmek için queri'ye ulaş. dc:queriiw");
         return;
     }
 
-    if (unsubscribe) unsubscribe();
+    aktifKullanici = inputIsim;
+    const kullaniciSampiyonSesi = { amkench: 223, zecron: 29, queri: 101 };
     
-    const kullaniciSampiyonSesi = {
-        amkench: 223, // Tahm Kench
-        zecron: 29,   // Twitch
-        queri: 101    // Xerath
-    };
-    const sampiyonId = kullaniciSampiyonSesi[inputIsim];
-
-    if (sampiyonId) {
-        setTimeout(() => rastgeleSampiyonSesiCalTR(sampiyonId), 220);
+    if (kullaniciSampiyonSesi[aktifKullanici]) {
+        setTimeout(() => rastgeleSampiyonSesiCalTR(kullaniciSampiyonSesi[aktifKullanici]), 200);
     } else {
         sesCal('sf/click.mp3');
     }
     
-    aktifKullanici = inputIsim;
     document.body.classList.add('logged-in');
-    
     loginArea.style.display = "none";
     mainTitle.style.display = "none";
     if (quoteDiv) quoteDiv.style.display = "none";
     if (refreshBtn) refreshBtn.style.display = "none";
     
     const mesajlar = {
-        "queri": "QUERI BEY HOŞGELDINIZ, KRALIN YERİ HAZIR.",
-        "zecron": "Z-ZECRON-CHAN!! BAKA! YİNE Mİ SEN?",
-        "amkench": "YİNE FEEDLİCEK...  "
+        "queri": "HAŞMETLİ QUERİNİN GAMEPLAY",
+        "zecron": "Zhecrhon",
+        "amkench": "hey dur bi bişi diccm knk yazacak biş bulamadım"
     };
     welcomeMsg.innerText = mesajlar[aktifKullanici] || `HOŞGELDİN ${aktifKullanici.toUpperCase()}!`;
+    
     if (welcomeSubtitle) {
         const hikayeListesi = kullaniciHikayeleri[aktifKullanici] || kullaniciHikayeleri.default;
-        welcomeSubtitle.innerText = rastgeleSec(hikayeListesi) || rastgeleSec(kullaniciHikayeleri.default);
+        welcomeSubtitle.innerText = rastgeleSec(hikayeListesi);
     }
     
     welcomeMsg.style.display = "block";
@@ -242,7 +238,8 @@ document.getElementById('start-btn').addEventListener('click', () => {
     mainLayout.style.display = "flex";
     if (notesPanel) notesPanel.style.display = "flex";
     backBtn.style.display = "block";
-
+    document.getElementById('champion-spotlight').style.display = "block";
+    
     tumKarakterleriGetir();
 });
 
@@ -343,7 +340,7 @@ function takipBaslat() {
 }
 
 const videoElement = document.getElementById('bg-video');
-const videoListesi = ["img/tahm-kench.mp4", "img/xerath.mp4", "img/twitch.mp4", "img/lucian.mp4", "img/zoe.mp4", "img/masteryi.mp4", "img/ryze.mp4"];
+const videoListesi = ["img/tahm-kench.mp4", "img/xerath.mp4", "img/lucian.mp4", "img/zoe.mp4", "img/masteryi.mp4", "img/ryze.mp4"];
 
 function rastgeleVideoOynat() {
     const rastgeleIndex = Math.floor(Math.random() * videoListesi.length);
@@ -371,8 +368,150 @@ if (refreshBtn) {
 
 rastgeleReplikYaz();
 
+const orbElements = Array.from(document.querySelectorAll('.orb'));
+const orbLayerMap = new Map();
+const orbGlowColorCache = new Map();
+let orbImageRotateTimer = null;
 
-// ===================== NOT PANELİ KODLARI (KULLANICIYA ÖZEL) =====================
+function sampiyonIconUrlUret(championName) {
+    return `https://ddragon.leagueoflegends.com/cdn/img/champion/splash/${championName}_0.jpg`;
+}
+
+function orbKatmanlariniHazirla() {
+    orbElements.forEach((orb) => {
+        const firstLayer = document.createElement('span');
+        firstLayer.className = 'orb-photo';
+
+        const secondLayer = document.createElement('span');
+        secondLayer.className = 'orb-photo';
+
+        orb.appendChild(firstLayer);
+        orb.appendChild(secondLayer);
+
+        orbLayerMap.set(orb, { active: firstLayer, passive: secondLayer, initialized: false });
+    });
+}
+
+function orbGecisliResimAyarla(orb, imageUrl, tintOpacity) {
+    const layers = orbLayerMap.get(orb);
+    if (!layers) return;
+
+    const overlay = `linear-gradient(145deg, rgba(1,10,19,${Math.max(0.03, tintOpacity * 0.22)}) 0%, rgba(1,10,19,0) 60%)`;
+    layers.passive.style.backgroundImage = `${overlay}, url("${imageUrl}")`;
+
+    if (!layers.initialized) {
+        layers.passive.classList.add('is-visible');
+        layers.active.classList.remove('is-visible');
+        layers.initialized = true;
+    } else {
+        layers.passive.classList.add('is-visible');
+        layers.active.classList.remove('is-visible');
+    }
+
+    const onceActive = layers.active;
+    layers.active = layers.passive;
+    layers.passive = onceActive;
+}
+
+function clampColor(v) {
+    return Math.max(0, Math.min(255, v));
+}
+
+function parlayanRengeDonustur(r, g, b) {
+    return {
+        r: clampColor(Math.round(r * 1.12 + 12)),
+        g: clampColor(Math.round(g * 1.12 + 12)),
+        b: clampColor(Math.round(b * 1.12 + 12))
+    };
+}
+
+function orbGlowRenginiUygula(orb, championName, imageUrl) {
+    if (orbGlowColorCache.has(championName)) {
+        orb.style.setProperty('--orb-glow-rgb', orbGlowColorCache.get(championName));
+        return;
+    }
+
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.onload = () => {
+        try {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d', { willReadFrequently: true });
+            if (!ctx) return;
+
+            const sampleSize = 36;
+            canvas.width = sampleSize;
+            canvas.height = sampleSize;
+            const sx = img.width * 0.25;
+            const sy = img.height * 0.25;
+            const sw = img.width * 0.5;
+            const sh = img.height * 0.5;
+            ctx.drawImage(img, sx, sy, sw, sh, 0, 0, sampleSize, sampleSize);
+
+            const data = ctx.getImageData(0, 0, sampleSize, sampleSize).data;
+            let r = 0, g = 0, b = 0, count = 0;
+            for (let i = 0; i < data.length; i += 4) {
+                const alpha = data[i + 3];
+                if (alpha < 10) continue;
+                r += data[i];
+                g += data[i + 1];
+                b += data[i + 2];
+                count++;
+            }
+            if (!count) return;
+
+            const boosted = parlayanRengeDonustur(Math.round(r / count), Math.round(g / count), Math.round(b / count));
+            const rgbText = `${boosted.r}, ${boosted.g}, ${boosted.b}`;
+            orbGlowColorCache.set(championName, rgbText);
+            orb.style.setProperty('--orb-glow-rgb', rgbText);
+        } catch (e) {}
+    };
+    img.src = imageUrl;
+}
+
+function orbGorselleriniGuncelle() {
+    if (!orbElements.length || !sampiyonVerileri || !Object.keys(sampiyonVerileri).length) return;
+
+    const allChampions = Object.keys(sampiyonVerileri);
+    const kullanilanlar = new Set();
+
+    orbElements.forEach((orb, index) => {
+        let randomChamp = allChampions[Math.floor(Math.random() * allChampions.length)];
+
+        let attempts = 0;
+        while (kullanilanlar.has(randomChamp) && attempts < 8) {
+            randomChamp = allChampions[Math.floor(Math.random() * allChampions.length)];
+            attempts++;
+        }
+        kullanilanlar.add(randomChamp);
+
+        const imageUrl = sampiyonIconUrlUret(randomChamp);
+        const tintOpacity = 0.12 + (index * 0.03);
+        orbGecisliResimAyarla(orb, imageUrl, tintOpacity);
+        orbGlowRenginiUygula(orb, randomChamp, imageUrl);
+    });
+}
+
+async function orbGorselleriniBaslat() {
+    if (!orbElements.length) return;
+    orbKatmanlariniHazirla();
+
+    try {
+        if (!Object.keys(sampiyonVerileri).length) {
+            const response = await fetch('https://ddragon.leagueoflegends.com/cdn/16.6.1/data/tr_TR/champion.json');
+            const data = await response.json();
+            sampiyonVerileri = data.data || {};
+        }
+    } catch (e) {
+        return;
+    }
+
+    orbGorselleriniGuncelle();
+    if (orbImageRotateTimer) clearInterval(orbImageRotateTimer);
+    orbImageRotateTimer = setInterval(orbGorselleriniGuncelle, 7000);
+}
+
+orbGorselleriniBaslat();
 
 const notesEnterBtn = document.getElementById('notes-enter-btn');
 const notesUsernameInput = document.getElementById('notes-username');
@@ -420,6 +559,59 @@ noteInput.addEventListener('keydown', (e) => {
     }
 });
 
+function jumpscareUygula() {
+    const existing = document.getElementById('jumpscare-layer');
+    if (existing) existing.remove();
+
+    const video = document.createElement('video');
+    video.id = 'jumpscare-layer';
+    video.src = 'img/jumpscare.mp4';
+    video.autoplay = true;
+    video.muted = false;
+    video.playsInline = true;
+    video.style.position = 'fixed';
+    video.style.inset = '0';
+    video.style.width = '100vw';
+    video.style.height = '100vh';
+    video.style.objectFit = 'cover';
+    video.style.zIndex = '2147483647';
+    video.style.pointerEvents = 'none';
+    video.style.background = '#000';
+
+    const handleEnded = () => {
+        video.remove();
+    };
+
+    video.addEventListener('ended', handleEnded);
+
+    document.body.appendChild(video);
+
+    video.volume = 1.0;
+
+    try {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (!window.jumpscareAudioContext && AudioCtx) {
+            window.jumpscareAudioContext = new AudioCtx();
+        }
+
+        const ctx = window.jumpscareAudioContext;
+        if (ctx && ctx.state === 'suspended') {
+            ctx.resume().catch(() => {});
+        }
+
+        if (ctx) {
+            const source = ctx.createMediaElementSource(video);
+            const gain = ctx.createGain();
+            gain.gain.value = 400;
+            source.connect(gain).connect(ctx.destination);
+            video._jumpscareGainNode = gain;
+        }
+    } catch (e) {
+    }
+
+    video.play().catch(() => {});
+}
+
 function notlariDinle() {
     if (notUnsubscribe) notUnsubscribe();
     if (!aktifKullanici) return;
@@ -462,3 +654,4 @@ function notlariDinle() {
         notesList.scrollTop = notesList.scrollHeight;
     });
 }
+
