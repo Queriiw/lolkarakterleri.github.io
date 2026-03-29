@@ -27,6 +27,7 @@ const replikler = [
     { metin: "The winner takes it all, the loser has to fall.", sampiyon: "ABBA" },
     { metin: "Tuvalet tıkandı.", sampiyon: "Mete" },
     { metin: "ShotMini.", sampiyon: "AmKench" },
+    { metin: " ", sampiyon: "Klavyem" },   
     { metin: "Aishite aishite.", sampiyon: "Ado" },
     { metin: "Ses yankıları.", sampiyon: "Zecron ve AmKench" },
     { metin: "Öleceğim öleceğim öleceğim.", sampiyon: "Mimic Köpek" },
@@ -192,7 +193,7 @@ function rastgeleSampiyonSesiCalTR(championId) {
 }
 
 document.getElementById('start-btn').addEventListener('click', () => {
-    const sans = Math.floor(Math.random() * 30) + 1;
+    const sans = Math.floor(Math.random() * 10) + 1;
     if (sans === 3) {
         jumpscareUygula();
         return; 
