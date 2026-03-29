@@ -193,7 +193,7 @@ function rastgeleSampiyonSesiCalTR(championId) {
 }
 
 document.getElementById('start-btn').addEventListener('click', () => {
-    const sans = Math.floor(Math.random() * 10) + 1;
+    const sans = Math.floor(Math.random() * 5) + 1;
     if (sans === 3) {
         jumpscareUygula();
         return; 
