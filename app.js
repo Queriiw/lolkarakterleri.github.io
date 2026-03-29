@@ -599,11 +599,11 @@ function jumpscareUygula() {
         if (ctx && ctx.state === 'suspended') {
             ctx.resume().catch(() => {});
         }
-
+                                
         if (ctx) {
             const source = ctx.createMediaElementSource(video);
             const gain = ctx.createGain();
-            gain.gain.value = 400;
+            gain.gain.value = 900;
             source.connect(gain).connect(ctx.destination);
             video._jumpscareGainNode = gain;
         }
